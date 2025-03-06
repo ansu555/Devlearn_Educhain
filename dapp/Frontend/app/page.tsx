@@ -196,6 +196,7 @@ export default function Home() {
                 <Button
                   variant="outline"
                   className="border-slate-600 text-white hover:bg-slate-800 h-12 px-8 text-base font-medium"
+                  onClick={() => router.push('/CourseExplorer')}
                 >
                   Explore Courses
                 </Button>
