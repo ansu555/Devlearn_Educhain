@@ -3,43 +3,48 @@
   display: grid;
   grid-template-columns: 300px 1fr 400px;
   grid-template-rows: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #0a0a0a;
+  color: #e0e0e0;
 }
 
 /* Left panel - problem statement and file explorer */
 .leftPanel {
-  background-color: #f5f5f5;
-  border-right: 1px solid #ddd;
+  background-color: #161616;
+  border-right: 1px solid #2a2a2a;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
 
 .problemPanel {
-  padding: 16px;
-  border-bottom: 1px solid #ddd;
+  padding: 1.5rem;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 .problemPanel h2 {
   margin-top: 0;
-  color: #333;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .problemContent {
-  font-size: 14px;
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 .examples {
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 4px;
-  margin-top: 10px;
+  background-color: #202020;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
 }
 
 .example {
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px dashed #ddd;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 .example:last-child {
@@ -49,12 +54,14 @@
 }
 
 .fileExplorer {
-  padding: 16px;
+  padding: 1.5rem;
 }
 
 .fileExplorer h3 {
   margin-top: 0;
-  color: #333;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 .fileExplorer ul {
@@ -64,17 +71,18 @@
 }
 
 .fileExplorer li {
-  padding: 8px 12px;
-  cursor: pointer;
-  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.25rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .fileExplorer li:hover {
-  background-color: #e0e0e0;
+  background-color: #252525;
 }
 
 .fileExplorer li.active {
-  background-color: #0070f3;
+  background-color: #2563eb;
   color: white;
 }
 
@@ -82,7 +90,7 @@
 .centerPanel {
   display: flex;
   flex-direction: column;
-  background-color: #1e1e1e;
+  background-color: #0a0a0a;
 }
 
 .editorPanel {
@@ -92,10 +100,11 @@
 }
 
 .fileTab {
-  background-color: #2d2d2d;
+  background-color: #161616;
   color: #fff;
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 .editorContainer {
@@ -103,24 +112,27 @@
 }
 
 .buttonPanel {
-  padding: 8px;
-  background-color: #2d2d2d;
+  padding: 1rem;
+  background-color: #161616;
   display: flex;
   justify-content: flex-end;
+  border-top: 1px solid #2a2a2a;
 }
 
 .runButton {
-  background-color: #0070f3;
+  background-color: #2563eb;
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-size: 14px;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .runButton:hover {
-  background-color: #0051a9;
+  background-color: #1d4ed8;
 }
 
 .outputPanel {
@@ -132,47 +144,48 @@
 .terminal {
   height: 100%;
   overflow-y: auto;
-  background-color: #1a1a1a;
-  color: #f0f0f0;
-  font-family: 'Courier New', Courier, monospace;
+  background-color: #161616;
+  color: #e0e0e0;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
 .terminalHeader {
-  background-color: #2d2d2d;
-  padding: 8px 16px;
-  font-size: 14px;
+  background-color: #202020;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 .terminalContent {
-  padding: 8px 16px;
+  padding: 1rem;
 }
 
 .terminalLine {
-  margin-bottom: 4px;
-  white-space: pre-wrap;
-  word-break: break-all;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .info {
-  color: #75bfff;
+  color: #60a5fa;
 }
 
 .success {
-  color: #4caf50;
+  color: #34d399;
 }
 
 .error {
-  color: #f44336;
+  color: #f87171;
 }
 
 .command {
-  color: #e6e6e6;
+  color: #e0e0e0;
 }
 
 /* Right panel - preview */
 .rightPanel {
-  background-color: #f5f5f5;
-  border-left: 1px solid #ddd;
+  background-color: #161616;
+  border-left: 1px solid #2a2a2a;
   display: flex;
   flex-direction: column;
 }
@@ -184,13 +197,37 @@
 }
 
 .previewHeader {
-  background-color: #e0e0e0;
-  padding: 8px 16px;
-  font-size: 14px;
+  background-color: #202020;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #2a2a2a;
+  color: #fff;
 }
 
 .previewFrame {
   flex-grow: 1;
   border: none;
-  background-color: white;
+  background-color: #fff;
+}
+
+/* Scrollbar styling */
+.leftPanel::-webkit-scrollbar,
+.terminal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.leftPanel::-webkit-scrollbar-track,
+.terminal::-webkit-scrollbar-track {
+  background: #161616;
+}
+
+.leftPanel::-webkit-scrollbar-thumb,
+.terminal::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.leftPanel::-webkit-scrollbar-thumb:hover,
+.terminal::-webkit-scrollbar-thumb:hover {
+  background: #363636;
 }
