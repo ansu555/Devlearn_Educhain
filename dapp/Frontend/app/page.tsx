@@ -29,6 +29,12 @@ export default function Home() {
   const router = useRouter() 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrollY, setScrollY] = useState(0)
+  const navItems = [
+    { name: "Courses", path: "/courses" },
+    { name: "Community", path: "#community" },
+    { name: "Problems", path: "/problems" }
+  ]
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,16 +71,28 @@ export default function Home() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            {["Features", "Courses", "Pricing", "Community", "Problems"].map((item, index) => (
-              <motion.a
-                key={item}
-                href={`#${item.toLowerCase()}`}
+            {[
+              { name: "Features", path: "#features" },
+              { name: "Courses", path: "/CourseExplorer" },
+              { name: "Pricing", path: "#pricing" },
+              { name: "Community", path: "#community" },
+              { name: "Problems", path: "/playground" }
+            ].map((item, index) => (
+                <motion.a
+                  key={item.name}
+                  href={item.path}
+                  onClick={(e) => {
+                    if (item.path.startsWith("/")) {
+                      e.preventDefault()
+                      router.push(item.path)
+                    }
+                  }}
                 className="text-sm font-medium text-slate-300 hover:text-white relative group"
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                {item}
+                {item.name}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-cyan-400 transition-all duration-300 group-hover:w-full"></span>
               </motion.a>
             ))}
@@ -104,14 +122,26 @@ export default function Home() {
             className="md:hidden bg-slate-800 shadow-lg"
           >
             <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
-              {["Features", "Courses", "Pricing", "Community"].map((item) => (
+              {[
+                { name: "Features", path: "#features" },
+                { name: "Courses", path: "/CourseExplorer" },
+                { name: "Pricing", path: "#pricing" },
+                { name: "Community", path: "#community" },
+                { name: "Problems", path: "/Playground"}
+              ].map((item) => (
                 <a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
+                  key={item.name}
+                  href={item.path}
+                  onClick={(e) => {
+                    setIsMenuOpen(false)
+                    if (item.path.startsWith("/")) {
+                      e.preventDefault()
+                      router.push(item.path)
+                    }
+                  }}
                   className="text-sm font-medium text-slate-300 hover:text-white py-2"
-                  onClick={() => setIsMenuOpen(false)}
                 >
-                  {item}
+                  {item.name}
                 </a>
               ))}
               <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0 w-full">
@@ -121,7 +151,7 @@ export default function Home() {
           </motion.div>
         )}
       </header>
-
+     
       {/* Hero Section */}
       <section className="pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center opacity-10"></div>

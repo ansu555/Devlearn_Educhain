@@ -1,6 +1,6 @@
 // Frontend/app/playground/page.jsx
 import React from 'react';
-import SmartContractPlayground from '../components/SmartContractPlayground';
+import SmartContractPlayground from '../SmartContractPlayground';
 
 export const metadata = {
   title: 'Smart Contract Playground',
