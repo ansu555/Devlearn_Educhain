@@ -230,7 +230,5 @@ export default function SearchAndFilter({
     </motion.div>
   )
 }
-
-// Import Badge component if not already imported
 import { Badge } from "../../components/ui/badge"
 
