@@ -32,7 +32,7 @@ export default function Home() {
   const navItems = [
     { name: "Courses", path: "/courses" },
     { name: "Community", path: "#community" },
-    { name: "Problems", path: "/problems" }
+    { name: "Problems", path: "/playground/react" }  // Update this path
   ]
 
 
@@ -76,7 +76,7 @@ export default function Home() {
               { name: "Courses", path: "/CourseExplorer" },
               { name: "Pricing", path: "#pricing" },
               { name: "Community", path: "#community" },
-              { name: "Problems", path: "/playground" }
+              { name: "Problems", path: "/playground/react" }  // Update this path too
             ].map((item, index) => (
                 <motion.a
                   key={item.name}
@@ -127,7 +127,7 @@ export default function Home() {
                 { name: "Courses", path: "/CourseExplorer" },
                 { name: "Pricing", path: "#pricing" },
                 { name: "Community", path: "#community" },
-                { name: "Problems", path: "/Playground"}
+                { name: "Problems", path: "/playground/react" }  // Update this path
               ].map((item) => (
                 <a
                   key={item.name}
