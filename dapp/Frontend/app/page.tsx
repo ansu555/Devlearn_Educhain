@@ -32,7 +32,8 @@ export default function Home() {
   const navItems = [
     { name: "Courses", path: "/courses" },
     { name: "Community", path: "#community" },
-    { name: "Problems", path: "/playground/react" }  // Update this path
+    { name: "Problems", path: "/Challanges" }
+    
   ]
 
 
@@ -76,7 +77,7 @@ export default function Home() {
               { name: "Courses", path: "/CourseExplorer" },
               { name: "Pricing", path: "#pricing" },
               { name: "Community", path: "#community" },
-              { name: "Problems", path: "/playground/react" }  // Update this path too
+              { name: "Problems", path: "/Challanges" }
             ].map((item, index) => (
                 <motion.a
                   key={item.name}
