@@ -3,53 +3,87 @@
 import { useState, useEffect } from "react"
 import { Search, Code, BookOpen, Award, ChevronRight, Filter, ArrowUpRight, X, Menu } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
 import { Input } from "../../components/ui/input"
 import { Button } from "../../components/ui/button"
 import { Badge } from "../../components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
+
 export default function CourseExplorer() {
   const router = useRouter()
+
+  // State for courses, filters, loading, etc.
+  const [courses, setCourses] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [filteredCourses, setFilteredCourses] = useState(courses)
+  const [filteredCourses, setFilteredCourses] = useState<any[]>([])
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [isLoading, setIsLoading] = useState(true)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+  // 1. Fetch courses from your API on mount
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
+    const fetchCourses = async () => {
+      setIsLoading(true)
+      try {
+        const res = await fetch("/api/courses")
+        const data = await res.json()
+        setCourses(data)
+        setFilteredCourses(data) // initialize filteredCourses
+      } catch (error) {
+        console.error("Error fetching courses:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchCourses()
   }, [])
 
+  // 2. Filter logic whenever searchQuery or selectedCategory changes
   useEffect(() => {
-    let result = courses
+    let result = [...courses]
 
-    // Filter by search query
     if (searchQuery) {
-      result = result.filter(
-        (course) =>
-          course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          course.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      result = result.filter((course) =>
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.description.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 
-    // Filter by category
     if (selectedCategory !== "all") {
       result = result.filter((course) => course.category === selectedCategory)
     }
 
     setFilteredCourses(result)
-  }, [searchQuery, selectedCategory])
+  }, [searchQuery, selectedCategory, courses])
+
+  // 3. Optional: Generate a new course via the API (placeholder for Gemini integration)
+  const handleGenerateCourse = async () => {
+    try {
+      setIsLoading(true)
+      const res = await fetch("/api/courses", {
+        method: "POST",
+      })
+      const newCourse = await res.json()
+      // Add new course to local state
+      setCourses((prev) => [...prev, newCourse])
+    } catch (error) {
+      console.error("Error generating AI course:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
       {/* Header */}
       <header
-       className={`fixed w-full z-50 transition-all duration-300 ${scrollY > 50 ? "bg-slate-900/90 backdrop-blur-md py-3 shadow-lg" : "bg-transparent py-5"}`}
+        className={`fixed w-full z-50 transition-all duration-300 ${
+          // "scrollY" won't work directly in React. You might handle scroll in a useEffect if you want to toggle classes
+          // or simply remove the condition for now:
+          "bg-slate-900/90 backdrop-blur-md py-3 shadow-lg"
+        }`}
       >
         <div className="container mx-auto px-4 flex justify-between items-center">
           <motion.div
@@ -76,17 +110,17 @@ export default function CourseExplorer() {
               { name: "Courses", path: "/CourseExplorer" },
               { name: "Pricing", path: "#pricing" },
               { name: "Community", path: "#community" },
-              { name: "Problems", path: "/Challanges" }
+              { name: "Problems", path: "/Challanges" },
             ].map((item, index) => (
-                <motion.a
-                  key={item.name}
-                  href={item.path}
-                  onClick={(e) => {
-                    if (item.path.startsWith("/")) {
-                      e.preventDefault()
-                      router.push(item.path)
-                    }
-                  }}
+              <motion.a
+                key={item.name}
+                href={item.path}
+                onClick={(e) => {
+                  if (item.path.startsWith("/")) {
+                    e.preventDefault()
+                    router.push(item.path)
+                  }
+                }}
                 className="text-sm font-medium text-slate-300 hover:text-white relative group"
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -101,14 +135,23 @@ export default function CourseExplorer() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.4 }}
             >
-              <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0"  onClick={() => router.push('../signup')}>
+              <Button
+                className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0"
+                onClick={() => router.push("../signup")}
+              >
                 Sign in
               </Button>
             </motion.div>
           </nav>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden text-white" onClick={() => {setIsMenuOpen(!isMenuOpen); router.push('/signup');}}>
+          <button
+            className="md:hidden text-white"
+            onClick={() => {
+              setIsMenuOpen(!isMenuOpen)
+              router.push("/signup")
+            }}
+          >
             {isMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -127,7 +170,7 @@ export default function CourseExplorer() {
                 { name: "Courses", path: "/CourseExplorer" },
                 { name: "Pricing", path: "#pricing" },
                 { name: "Community", path: "#community" },
-                { name: "Problems", path: "/playground/react" }  // Update this path
+                { name: "Problems", path: "/playground/react" },
               ].map((item) => (
                 <a
                   key={item.name}
@@ -158,7 +201,7 @@ export default function CourseExplorer() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12 pt-20"  // Added pt-20 here
+          className="text-center mb-12 pt-20"
         >
           <h1 className="text-4xl font-bold mb-4">Explore Our Courses</h1>
           <p className="text-gray-400 max-w-2xl mx-auto">
@@ -167,7 +210,7 @@ export default function CourseExplorer() {
           </p>
         </motion.div>
 
-        {/* Search and Filter Section */}
+        {/* Search & Filter Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -210,6 +253,16 @@ export default function CourseExplorer() {
             </TabsList>
           </Tabs>
         </motion.div>
+
+        {/* Button to Generate an AI Course (for demo) */}
+        <div className="mb-8 text-center">
+          <Button
+            className="bg-purple-600 hover:bg-purple-700"
+            onClick={handleGenerateCourse}
+          >
+            Generate AI Course
+          </Button>
+        </div>
 
         {/* Course Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -267,7 +320,11 @@ export default function CourseExplorer() {
                 </motion.div>
               ))
             ) : (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="col-span-full text-center py-12">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="col-span-full text-center py-12"
+              >
                 <p className="text-gray-400">No courses found matching your search criteria.</p>
                 <Button
                   variant="link"
@@ -306,68 +363,3 @@ export default function CourseExplorer() {
     </div>
   )
 }
-
-// Sample course data
-const courses = [
-  {
-    id: 1,
-    title: "Solidity Smart Contract Development",
-    description: "Learn to build secure and efficient smart contracts on Ethereum",
-    level: "Intermediate",
-    duration: "8 weeks",
-    modules: 12,
-    credentials: "Verified Smart Contract Developer",
-    category: "smart-contracts",
-  },
-  {
-    id: 2,
-    title: "Blockchain Fundamentals",
-    description: "Master the core concepts of blockchain technology",
-    level: "Beginner",
-    duration: "6 weeks",
-    modules: 10,
-    credentials: "Blockchain Foundation Certificate",
-    category: "blockchain",
-  },
-  {
-    id: 3,
-    title: "Web3.js & Ethers.js Mastery",
-    description: "Build decentralized applications with JavaScript libraries",
-    level: "Intermediate",
-    duration: "5 weeks",
-    modules: 8,
-    credentials: "Web3 Developer Certificate",
-    category: "web3",
-  },
-  {
-    id: 4,
-    title: "DeFi Protocol Development",
-    description: "Create your own decentralized finance applications",
-    level: "Advanced",
-    duration: "10 weeks",
-    modules: 15,
-    credentials: "DeFi Architect Certificate",
-    category: "defi",
-  },
-  {
-    id: 5,
-    title: "Zero-Knowledge Proofs",
-    description: "Implement privacy-preserving solutions with ZK proofs",
-    level: "Advanced",
-    duration: "7 weeks",
-    modules: 9,
-    credentials: "ZK Developer Certificate",
-    category: "blockchain",
-  },
-  {
-    id: 6,
-    title: "Smart Contract Security & Auditing",
-    description: "Learn to identify and fix vulnerabilities in smart contracts",
-    level: "Advanced",
-    duration: "8 weeks",
-    modules: 12,
-    credentials: "Smart Contract Security Expert",
-    category: "smart-contracts",
-  },
-]
-
