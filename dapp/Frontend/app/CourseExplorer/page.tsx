@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Code, BookOpen, Award, ChevronRight, X, Menu } from "lucide-react";
+import { Code, BookOpen, Award, ChevronRight, X, Menu, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Input } from "../../components/ui/input";
@@ -32,9 +32,18 @@ export default function CourseExplorer() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showAIModal, setShowAIModal] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [completedCourses, setCompletedCourses] = useState<number[]>([]);
+  const [walletAddress, setWalletAddress] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1000);
+    
+    // Check for connected wallet on component mount
+    const storedAddress = localStorage.getItem("walletAddress");
+    if (storedAddress) {
+      setWalletAddress(storedAddress);
+    }
+    
     return () => clearTimeout(timer);
   }, []);
 
@@ -95,6 +104,27 @@ export default function CourseExplorer() {
     }
   };
 
+  const toggleCourseCompletion = (courseId: number, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent card click event from triggering
+    setCompletedCourses(prev => 
+      prev.includes(courseId)
+        ? prev.filter(id => id !== courseId) // Remove if already completed
+        : [...prev, courseId]  // Add if not completed
+    );
+  };
+
+  // Function to disconnect wallet
+  const disconnectWallet = () => {
+    localStorage.removeItem("walletAddress");
+    setWalletAddress("");
+  }
+
+  // Function to format address for display
+  const formatAddress = (address) => {
+    if (!address) return "";
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
       <header className="fixed w-full z-50 bg-slate-900/90 backdrop-blur-md py-3 shadow-lg">
@@ -140,6 +170,31 @@ export default function CourseExplorer() {
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-cyan-400 transition-all duration-300 group-hover:w-full" />
               </motion.a>
             ))}
+            
+            {/* Add wallet display */}
+            {walletAddress ? (
+              <div className="flex items-center gap-2">
+                <div className="bg-slate-800 border border-slate-700 rounded-full px-4 py-1 text-sm text-cyan-400">
+                  {formatAddress(walletAddress)}
+                </div>
+                <Button 
+                  size="sm" 
+                  variant="ghost"
+                  className="text-slate-400 hover:text-white"
+                  onClick={disconnectWallet}
+                  title="Disconnect wallet"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0"  
+                onClick={() => router.push('../signup')}
+              >
+                Sign in
+              </Button>
+            )}
           </nav>
 
           <button
@@ -245,7 +300,24 @@ export default function CourseExplorer() {
                 <Card className="bg-gray-900 border-gray-800 h-full flex flex-col overflow-hidden">
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
-                      <Badge className="bg-purple-600 hover:bg-purple-700">{course.level}</Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-purple-600 hover:bg-purple-700">{course.level}</Badge>
+                        <div 
+                          onClick={(e) => toggleCourseCompletion(course.id, e)}
+                          className={`w-6 h-6 rounded border flex items-center justify-center cursor-pointer transition-colors ${
+                            completedCourses.includes(course.id) 
+                              ? 'bg-green-500 border-green-600' 
+                              : 'bg-transparent border-gray-600 hover:border-gray-400'
+                          }`}
+                          title={completedCourses.includes(course.id) ? "Mark as incomplete" : "Mark as complete"}
+                        >
+                          {completedCourses.includes(course.id) && (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          )}
+                        </div>
+                      </div>
                       <Badge variant="outline" className="border-gray-700">{course.duration}</Badge>
                     </div>
                     <CardTitle className="text-xl mt-2">{course.title}</CardTitle>
@@ -392,7 +464,7 @@ const courses = [
   },
   {
     id: 3,
-    title: "Web3.js & Ethers.js Mastery",
+    title: "Web3.js & Eethers.js Mastery",
     description: "Build decentralized applications with JavaScript libraries",
     level: "Intermediate",
     duration: "5 weeks",

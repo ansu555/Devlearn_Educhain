@@ -17,6 +17,7 @@ import {
   Shield,
   Twitter,
   X,
+  LogOut,
 } from "lucide-react"
 
 import { Button } from "../components/ui/button"
@@ -29,22 +30,39 @@ export default function Home() {
   const router = useRouter() 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrollY, setScrollY] = useState(0)
+  const [walletAddress, setWalletAddress] = useState("")
   const navItems = [
     { name: "Courses", path: "/courses" },
     { name: "Community", path: "#community" },
     { name: "Problems", path: "/Challanges" }
-    
   ]
-
 
   useEffect(() => {
     const handleScroll = () => {
       setScrollY(window.scrollY)
     }
 
+    // Check for connected wallet on component mount
+    const storedAddress = localStorage.getItem("walletAddress");
+    if (storedAddress) {
+      setWalletAddress(storedAddress);
+    }
+
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  // Function to disconnect wallet
+  const disconnectWallet = () => {
+    localStorage.removeItem("walletAddress");
+    setWalletAddress("");
+  }
+
+  // Function to format address for display (0x1234...5678)
+  const formatAddress = (address) => {
+    if (!address) return "";
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
@@ -102,9 +120,29 @@ export default function Home() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.4 }}
             >
-              <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0"  onClick={() => router.push('../signup')}>
-                Sign in
-              </Button>
+              {walletAddress ? (
+                <div className="flex items-center gap-2">
+                  <div className="bg-slate-800 border border-slate-700 rounded-full px-4 py-1 text-sm text-cyan-400">
+                    {formatAddress(walletAddress)}
+                  </div>
+                  <Button 
+                    size="sm" 
+                    variant="ghost"
+                    className="text-slate-400 hover:text-white"
+                    onClick={disconnectWallet}
+                    title="Disconnect wallet"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0"  
+                  onClick={() => router.push('../signup')}
+                >
+                  Sign in
+                </Button>
+              )}
             </motion.div>
           </nav>
 

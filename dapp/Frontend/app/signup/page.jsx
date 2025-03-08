@@ -1,18 +1,52 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useEffect } from "react"; // Add useState and useEffect
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { useOCAuth } from "@opencampus/ocid-connect-js"; // Import the hook
+import { useRouter } from "next/navigation"; // Import router
 
 export default function SignUpPage() {
   const { ocAuth } = useOCAuth();
+  const router = useRouter();
+  const [walletAddress, setWalletAddress] = useState("");
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [error, setError] = useState("");
 
   const handleOCIDLogin = async () => {
     try {
       await ocAuth.signInWithRedirect({ state: "opencampus" });
     } catch (error) {
       console.error("Login error:", error);
+    }
+  };
+
+  const handleMetaMaskLogin = async () => {
+    setIsConnecting(true);
+    setError("");
+    
+    try {
+      // Check if MetaMask is installed
+      if (!window.ethereum) {
+        throw new Error("MetaMask is not installed. Please install MetaMask and try again.");
+      }
+
+      // Request account access
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const address = accounts[0];
+      
+      // Store wallet address in localStorage for persistence
+      localStorage.setItem("walletAddress", address);
+      setWalletAddress(address);
+      
+      // Redirect to home page after successful login
+      router.push('/');
+    } catch (error) {
+      console.error("MetaMask connection failed:", error);
+      setError(error.message || "Failed to connect to MetaMask");
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -42,6 +76,13 @@ export default function SignUpPage() {
             <div className="text-center">
               <h1 className="text-3xl font-bold">Create account</h1>
             </div>
+
+            {/* Display error if any */}
+            {error && (
+              <div className="bg-red-500/20 border border-red-500 text-red-300 px-4 py-2 rounded text-sm">
+                {error}
+              </div>
+            )}
 
             {/* Social login buttons */}
             <div className="space-y-3">
@@ -73,12 +114,14 @@ export default function SignUpPage() {
               <Button 
                 variant="outline" 
                 className="w-full border-gray-700 py-6 hover:bg-gray-800"
+                onClick={handleMetaMaskLogin}
+                disabled={isConnecting}
               >
                 {/* Metamask SVG */}
                 <svg viewBox="0 0 24 24" className="mr-2 h-5 w-5" fill="currentColor">
                   <path d="M16.582 15.387l-1.368-1.87 1.368-1.87h-3.163l-1.368 1.87 1.368 1.87h3.163zm-9.77.129l-1.368-1.87 1.368-1.87 1.368 1.87-1.368 1.87zm3.163 0l1.368-1.87-1.368-1.87-1.368 1.87 1.368 1.87zm0-3.74l1.368-1.87-1.368-1.87-1.368 1.87 1.368 1.87zm3.162 0l1.368-1.87-1.368-1.87h-3.162l-1.368 1.87 1.368 1.87h3.162z"/>
                 </svg>
-                Continue with Metamask
+                {isConnecting ? "Connecting..." : "Continue with MetaMask"}
               </Button>
               
               <Button 
