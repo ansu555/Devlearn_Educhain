@@ -17,31 +17,53 @@ export async function POST(req: Request) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     
     const structuredPrompt = `
-      Create a detailed course structure about: ${prompt}
+      Create a comprehensive course structure about: ${prompt}
       
-      Requirements:
-      1. Organize content into multiple units (Unit 1, Unit 2, etc.) based on complexity
-      2. Each unit must have 3-5 subparts
-      3. Each subpart must contain at least 500 words of in-depth explanation
-      4. Use this exact format:
+      Strict Requirements:
+      1. Exactly 5 units total
+      2. Each unit must have exactly 5 subparts
+      3. Maintain this exact format:
       
-      # Course Title
+      # [Course Title]
       
       ## Unit 1: [Unit Title]
-      ### 1.1 [Subpart Title]
-      [Detailed content... (minimum 500 words)]
+      ### 1.1 [Core Concepts]
+      [Detailed theoretical foundation with mathematical formulations]
       
-      ### 1.2 [Subpart Title]
-      [Detailed content...]
+      ### 1.2 [Technical Specifications]
+      [Technical breakdown with code samples and diagrams]
+      
+      ### 1.3 [Implementation Guide]
+      [Step-by-step implementation instructions]
+      
+      ### 1.4 [Case Studies]
+      [Real-world applications and analysis]
+      
+      ### 1.5 [Security Considerations]
+      [Potential vulnerabilities and mitigation strategies]
       
       ## Unit 2: [Unit Title]
-      ### 2.1 [Subpart Title]
-      [Detailed content...]
+      ### 2.1 [Advanced Theory]
+      ### 2.2 [Optimization Techniques]
+      ### 2.3 [Testing Methods]
+      ### 2.4 [Industry Best Practices]
+      ### 2.5 [Troubleshooting Guide]
       
-      ...continue for all units...
+      ... Continue pattern for Units 3-5 ...
       
-      Include practical examples, diagrams (in markdown format), and real-world applications.
-      Maintain academic rigor while keeping explanations accessible.
+      ## Unit 5: [Unit Title]
+      ### 5.1 [Emerging Trends]
+      ### 5.2 [Future Predictions]
+      ### 5.3 [Capstone Project]
+      ### 5.4 [Final Assessment]
+      ### 5.5 [Additional Resources]
+      
+      Content Guidelines:
+      - Include code blocks with proper syntax highlighting
+      - Use mathematical notation where applicable
+      - Add conceptual diagrams in markdown format
+      - Provide real blockchain examples
+      - Mention Ethereum Improvement Proposals (EIPs) when relevant
     `;
 
     const result = await model.generateContent(structuredPrompt);

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Badge } from "../ui/badge"
 import { Card } from "../ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
@@ -78,11 +79,17 @@ export default function ChallengesList() {
   const [activeTab, setActiveTab] = useState("all")
 
   // Get unique technologies for filter tabs
-  const technologies = Array.from(new Set(challenges.flatMap((challenge) => challenge.technologies)))
+  const technologies = Array.from(
+    new Set(challenges.flatMap((challenge) => challenge.technologies))
+  )
 
   // Filter challenges based on active tab
   const filteredChallenges =
-    activeTab === "all" ? challenges : challenges.filter((challenge) => challenge.technologies.includes(activeTab))
+    activeTab === "all"
+      ? challenges
+      : challenges.filter((challenge) =>
+          challenge.technologies.includes(activeTab)
+        )
 
   return (
     <div>
@@ -118,6 +125,8 @@ export default function ChallengesList() {
 }
 
 function ChallengeCard({ challenge }: { challenge: Challenge }) {
+  const router = useRouter() // Initialize the router
+
   // Map technology to its corresponding icon/color
   const getTechIcon = (tech: string) => {
     switch (tech.toLowerCase()) {
@@ -147,25 +156,36 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
     Advanced: "bg-red-500",
   }
 
+  // Handle routing when the button is clicked
+  const handleStartExplorer = () => {
+    router.push(`/problems`)
+  }
+
   return (
     <Card className="bg-[#161830] border border-[#2a2d4a] overflow-hidden hover:border-blue-500 transition-all duration-300 group">
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div className="flex gap-2">
             {challenge.technologies.map((tech) => (
-              <div key={tech} className="w-8 h-8 rounded-full bg-[#0f1124] p-1.5 flex items-center justify-center">
+              <div
+                key={tech}
+                className="w-8 h-8 rounded-full bg-[#0f1124] p-1.5 flex items-center justify-center"
+              >
                 <img
                   src={getTechIcon(tech) || "/placeholder.svg"}
                   alt={tech}
                   className="w-full h-full object-contain"
                   onError={(e) => {
-                    ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=24&width=24"
+                    ;(e.target as HTMLImageElement).src =
+                      "/placeholder.svg?height=24&width=24"
                   }}
                 />
               </div>
             ))}
           </div>
-          <Badge className={`${difficultyColor[challenge.difficulty]} text-white`}>{challenge.difficulty}</Badge>
+          <Badge className={`${difficultyColor[challenge.difficulty]} text-white`}>
+            {challenge.difficulty}
+          </Badge>
         </div>
 
         <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
@@ -182,7 +202,10 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
           <div className="text-gray-400 text-sm">{challenge.completions} completions</div>
         </div>
 
-        <button className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-md text-white font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+        <button
+          className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-md text-white font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          onClick={handleStartExplorer}
+        >
           <span>Start Explorer</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -191,7 +214,12 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M14 5l7 7m0 0l-7 7m7-7H3"
+            />
           </svg>
         </button>
       </div>
@@ -200,4 +228,3 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
     </Card>
   )
 }
-
