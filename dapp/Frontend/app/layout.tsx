@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import OCConnectWrapper from '../components/OCConnectWrapper';
 
 export const metadata: Metadata = {
   title: 'Devlearn',
@@ -12,9 +13,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const opts = {
+    redirectUri: 'http://localhost:3000/redirect', // Adjust this URL
+    referralCode: 'PARTNER6', // Assign partner code
+  };
+
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <OCConnectWrapper opts={opts} sandboxMode={true}>
+          {children}
+        </OCConnectWrapper>
+      </body>
     </html>
   )
 }
