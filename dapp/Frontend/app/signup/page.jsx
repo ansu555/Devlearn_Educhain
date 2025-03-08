@@ -86,12 +86,13 @@ export default function SignUpPage() {
                 className="w-full border-gray-700 py-6 hover:bg-gray-800"
                 onClick={handleOCIDLogin}  // Add the onClick handler here
               >
-            
-                {/* Optionally, reuse your OCID SVG */}
-                <svg viewBox="0 0 24 24" className="mr-2 h-5 w-5" fill="currentColor">
-                  <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
+                <Image
+                  src="/open-campus-edu-logo.svg" // Update with correct image path
+                  alt="OCID Logo"
+                  width={14} // Adjust size as needed
+                  height={14}
+                  className="mr-2"
+                />
                 Continue with OCID
               </Button>
             </div>
