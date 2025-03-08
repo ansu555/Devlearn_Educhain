@@ -1,56 +1,90 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Search, Code, BookOpen, Award, ChevronRight, Filter, ArrowUpRight, X, Menu } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useRouter } from 'next/navigation'
-import { Input } from "../../components/ui/input"
-import { Button } from "../../components/ui/button"
-import { Badge } from "../../components/ui/badge"
-import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
+import { useState, useEffect } from "react";
+import { Search, Code, BookOpen, Award, ChevronRight, Filter, ArrowUpRight, X, Menu } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card";
+
 export default function CourseExplorer() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filteredCourses, setFilteredCourses] = useState(courses)
-  const [selectedCategory, setSelectedCategory] = useState("all")
-  const [isLoading, setIsLoading] = useState(true)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredCourses, setFilteredCourses] = useState(courses);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // AI Integration States
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [generatedContent, setGeneratedContent] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
+
+  // Simulate loading
   useEffect(() => {
-    // Simulate loading
     const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
+  // Filter courses
   useEffect(() => {
-    let result = courses
+    let result = courses;
 
-    // Filter by search query
     if (searchQuery) {
       result = result.filter(
         (course) =>
           course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          course.description.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
+          course.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
 
-    // Filter by category
     if (selectedCategory !== "all") {
-      result = result.filter((course) => course.category === selectedCategory)
+      result = result.filter((course) => course.category === selectedCategory);
     }
 
-    setFilteredCourses(result)
-  }, [searchQuery, selectedCategory])
+    setFilteredCourses(result);
+  }, [searchQuery, selectedCategory]);
+
+  // Handle AI Generation
+  const handleAIGenerate = async () => {
+    if (!aiPrompt) return;
+
+    setIsGenerating(true);
+    setShowAIModal(true);
+
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: `Create a detailed learning path about: ${aiPrompt}. 
+          Include course objectives, key topics, and recommended resources.
+          Format using markdown headings and bullet points.`,
+        }),
+      });
+
+      const data = await response.json();
+      setGeneratedContent(data.content);
+    } catch (error) {
+      console.error("Generation failed:", error);
+      setGeneratedContent("Failed to generate content. Please try again.");
+    }
+
+    setIsGenerating(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
       {/* Header */}
-      <header
-       className={`fixed w-full z-50 transition-all duration-300 ${scrollY > 50 ? "bg-slate-900/90 backdrop-blur-md py-3 shadow-lg" : "bg-transparent py-5"}`}
-      >
+      <header className="fixed w-full z-50 bg-slate-900/90 backdrop-blur-md py-3 shadow-lg">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <motion.div
             initial={{ opacity: 0 }}
@@ -76,17 +110,17 @@ export default function CourseExplorer() {
               { name: "Courses", path: "/CourseExplorer" },
               { name: "Pricing", path: "#pricing" },
               { name: "Community", path: "#community" },
-              { name: "Problems", path: "/Challanges" }
+              { name: "Problems", path: "/Challanges" },
             ].map((item, index) => (
-                <motion.a
-                  key={item.name}
-                  href={item.path}
-                  onClick={(e) => {
-                    if (item.path.startsWith("/")) {
-                      e.preventDefault()
-                      router.push(item.path)
-                    }
-                  }}
+              <motion.a
+                key={item.name}
+                href={item.path}
+                onClick={(e) => {
+                  if (item.path.startsWith("/")) {
+                    e.preventDefault();
+                    router.push(item.path);
+                  }
+                }}
                 className="text-sm font-medium text-slate-300 hover:text-white relative group"
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -101,14 +135,20 @@ export default function CourseExplorer() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.4 }}
             >
-              <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0"  onClick={() => router.push('../signup')}>
+              <Button
+                className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0"
+                onClick={() => router.push("../signup")}
+              >
                 Sign in
               </Button>
             </motion.div>
           </nav>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden text-white" onClick={() => {setIsMenuOpen(!isMenuOpen); router.push('/signup');}}>
+          <button
+            className="md:hidden text-white"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
             {isMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -127,16 +167,16 @@ export default function CourseExplorer() {
                 { name: "Courses", path: "/CourseExplorer" },
                 { name: "Pricing", path: "#pricing" },
                 { name: "Community", path: "#community" },
-                { name: "Problems", path: "/playground/react" }  // Update this path
+                { name: "Problems", path: "/playground/react" },
               ].map((item) => (
                 <a
                   key={item.name}
                   href={item.path}
                   onClick={(e) => {
-                    setIsMenuOpen(false)
+                    setIsMenuOpen(false);
                     if (item.path.startsWith("/")) {
-                      e.preventDefault()
-                      router.push(item.path)
+                      e.preventDefault();
+                      router.push(item.path);
                     }
                   }}
                   className="text-sm font-medium text-slate-300 hover:text-white py-2"
@@ -158,7 +198,7 @@ export default function CourseExplorer() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12 pt-20"  // Added pt-20 here
+          className="text-center mb-12 pt-20"
         >
           <h1 className="text-4xl font-bold mb-4">Explore Our Courses</h1>
           <p className="text-gray-400 max-w-2xl mx-auto">
@@ -167,48 +207,30 @@ export default function CourseExplorer() {
           </p>
         </motion.div>
 
-        {/* Search and Filter Section */}
+        {/* AI Course Generator Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-12"
+          className="mb-12 p-6 bg-slate-800/50 rounded-xl border border-slate-700"
         >
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-center mb-8">
-            <div className="relative w-full max-w-xl">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="flex-1 w-full">
               <Input
-                type="text"
-                placeholder="Search for courses..."
-                className="pl-10 bg-gray-900 border-gray-700 text-white"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="What do you want to learn? (e.g., 'Blockchain basics for beginners')"
+                className="bg-slate-900 border-slate-700 text-white"
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
               />
             </div>
-            <Button variant="outline" className="border-gray-700 text-gray-300">
-              <Filter className="mr-2 h-4 w-4" /> Filters
+            <Button
+              onClick={handleAIGenerate}
+              disabled={!aiPrompt || isGenerating}
+              className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700"
+            >
+              {isGenerating ? "Generating..." : "AI Course Guide"}
             </Button>
           </div>
-
-          <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
-            <TabsList className="bg-gray-900 border border-gray-800 p-1 mb-8">
-              <TabsTrigger value="all" className="data-[state=active]:bg-purple-600">
-                All Courses
-              </TabsTrigger>
-              <TabsTrigger value="blockchain" className="data-[state=active]:bg-purple-600">
-                Blockchain
-              </TabsTrigger>
-              <TabsTrigger value="smart-contracts" className="data-[state=active]:bg-purple-600">
-                Smart Contracts
-              </TabsTrigger>
-              <TabsTrigger value="web3" className="data-[state=active]:bg-purple-600">
-                Web3
-              </TabsTrigger>
-              <TabsTrigger value="defi" className="data-[state=active]:bg-purple-600">
-                DeFi
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
         </motion.div>
 
         {/* Course Cards */}
@@ -273,8 +295,8 @@ export default function CourseExplorer() {
                   variant="link"
                   className="text-purple-400 mt-2"
                   onClick={() => {
-                    setSearchQuery("")
-                    setSelectedCategory("all")
+                    setSearchQuery("");
+                    setSelectedCategory("all");
                   }}
                 >
                   Clear filters
@@ -284,27 +306,48 @@ export default function CourseExplorer() {
           </AnimatePresence>
         </div>
 
-        {/* Featured Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-16 p-6 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-800/50"
-        >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Ready to advance your career?</h2>
-              <p className="text-gray-400">Join 50,000+ developers already learning on DevLearn</p>
-            </div>
-            <Button className="bg-white text-purple-900 hover:bg-gray-100 group">
-              Start Learning Now
-              <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
-            </Button>
-          </div>
-        </motion.div>
+        {/* AI Generated Content Modal */}
+        <AnimatePresence>
+          {showAIModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowAIModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                className="bg-slate-900 rounded-xl max-w-2xl w-full p-6 border border-slate-700"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-bold">AI Learning Path</h3>
+                  <button
+                    onClick={() => setShowAIModal(false)}
+                    className="text-slate-400 hover:text-white"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <div className="prose prose-invert max-h-[60vh] overflow-y-auto">
+                  {generatedContent ? (
+                    <div dangerouslySetInnerHTML={{ __html: generatedContent.replace(/\n/g, "<br />") }} />
+                  ) : (
+                    <div className="text-center py-8 text-slate-400">
+                      Generating learning path...
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
-  )
+  );
 }
 
 // Sample course data
@@ -370,4 +413,3 @@ const courses = [
     category: "smart-contracts",
   },
 ]
-

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.0",
     "@hookform/resolvers": "^3.9.1",
     "@monaco-editor/react": "^4.7.0",
     "@opencampus/ocid-connect-js": "^1.2.6",
