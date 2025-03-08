@@ -224,12 +224,19 @@ export default function CourseExplorer() {
               />
             </div>
             <Button
-              onClick={handleAIGenerate}
-              disabled={!aiPrompt || isGenerating}
-              className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700"
-            >
-              {isGenerating ? "Generating..." : "AI Course Guide"}
-            </Button>
+  onClick={handleAIGenerate}
+  disabled={!aiPrompt || isGenerating}
+  className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700"
+>
+  {isGenerating ? (
+    <div className="flex items-center gap-2">
+      <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+      Generating Detailed Curriculum...
+    </div>
+  ) : (
+    "Generate Full Curriculum"
+  )}
+</Button>
           </div>
         </motion.div>
 
@@ -306,45 +313,77 @@ export default function CourseExplorer() {
           </AnimatePresence>
         </div>
 
-        {/* AI Generated Content Modal */}
-        <AnimatePresence>
-          {showAIModal && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              onClick={() => setShowAIModal(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                className="bg-slate-900 rounded-xl max-w-2xl w-full p-6 border border-slate-700"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold">AI Learning Path</h3>
-                  <button
-                    onClick={() => setShowAIModal(false)}
-                    className="text-slate-400 hover:text-white"
-                  >
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
-
-                <div className="prose prose-invert max-h-[60vh] overflow-y-auto">
-                  {generatedContent ? (
-                    <div dangerouslySetInnerHTML={{ __html: generatedContent.replace(/\n/g, "<br />") }} />
-                  ) : (
-                    <div className="text-center py-8 text-slate-400">
-                      Generating learning path...
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            </motion.div>
+       {/* AI Generated Content Modal */}
+<AnimatePresence>
+  {showAIModal && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={() => setShowAIModal(false)}
+    >
+      <motion.div
+        initial={{ scale: 0.95 }}
+        animate={{ scale: 1 }}
+        className="bg-slate-900 rounded-xl max-w-4xl w-full p-6 border border-slate-700"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-bold">AI Learning Path</h3>
+          <button 
+            onClick={() => setShowAIModal(false)}
+            className="text-slate-400 hover:text-white"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+        
+        <div className="prose prose-invert max-h-[70vh] overflow-y-auto">
+          {generatedContent ? (
+            <div className="space-y-8">
+              {generatedContent.split('\n## ').map((section, sectionIndex) => {
+                const [unitTitle, ...unitContent] = section.split('\n### ');
+                return (
+                  <div key={sectionIndex} className="border-b border-slate-700 pb-6">
+                    {sectionIndex === 0 ? (
+                      <h1 className="text-3xl font-bold mb-4">{unitTitle}</h1>
+                    ) : (
+                      <>
+                        <h2 className="text-2xl font-semibold mb-4">
+                          Unit {sectionIndex}: {unitTitle.replace('## ', '')}
+                        </h2>
+                        {unitContent.map((subpart, subpartIndex) => {
+                          const [subpartTitle, ...subpartContent] = subpart.split('\n');
+                          return (
+                            <div key={subpartIndex} className="ml-4 mb-6">
+                              <h3 className="text-xl font-medium mb-3 text-purple-400">
+                                {subpartTitle.replace('### ', '')}
+                              </h3>
+                              <div className="space-y-3 text-slate-300">
+                                {subpartContent.join('\n').split('\n').map((line, lineIndex) => (
+                                  <p key={lineIndex}>{line}</p>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-slate-400">
+              <div className="animate-pulse">Generating detailed curriculum...</div>
+            </div>
           )}
-        </AnimatePresence>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
       </main>
     </div>
   );
