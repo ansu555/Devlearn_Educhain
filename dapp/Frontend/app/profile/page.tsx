@@ -1,33 +1,157 @@
-import { cn } from "../../lib/utils"
-import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
-import { Badge } from "../../components/ui/badge"
-import { Button } from "../../components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Progress } from "../../components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
-import { getUserProfile, getUserSolvedProblems } from "../../lib/user"
-import { Award, Calendar, CheckCircle, Github, Linkedin, Twitter } from "lucide-react"
-import Link from "next/link"
+"use client";
 
-export default async function ProfilePage() {
-  const profile = await getUserProfile()
-  const solvedProblems = await getUserSolvedProblems()
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { cn } from "../../lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
+import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import { Progress } from "../../components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { Award, Calendar, CheckCircle, Github, Linkedin, Twitter } from "lucide-react";
+import Link from "next/link";
 
-  // Calculate streak data
-  const currentStreak = profile.streakData.currentStreak
-  const maxStreak = profile.streakData.maxStreak
-  const streakPercentage = (currentStreak / maxStreak) * 100
+export default function ProfilePage() {
+  const router = useRouter();
+  const [walletAddress, setWalletAddress] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
+  const [solvedProblems, setSolvedProblems] = useState([]);
+
+  useEffect(() => {
+    // Check for connected wallet on component mount
+    const storedAddress = localStorage.getItem("walletAddress");
+    if (!storedAddress) {
+      // Redirect to login if no wallet is connected
+      router.push('/signup');
+      return;
+    }
+    
+    setWalletAddress(storedAddress);
+    
+    // Fetch user profile data
+    const fetchUserProfile = async () => {
+      try {
+        // In a real application, you would fetch this from your API
+        // For now, we'll use mock data
+        const mockProfile = {
+          name: "Dev User",
+          title: "Blockchain Developer",
+          avatar: "/placeholder.svg",
+          totalProblems: 100,
+          easyProblems: 40,
+          mediumProblems: 40,
+          hardProblems: 20,
+          streakData: {
+            currentStreak: 5,
+            maxStreak: 10,
+          },
+          social: {
+            github: "https://github.com",
+            twitter: "https://twitter.com",
+            linkedin: "https://linkedin.com",
+          },
+          achievements: [
+            { id: 1, name: "First Smart Contract" },
+            { id: 2, name: "Blockchain Pioneer" },
+            { id: 3, name: "5 Day Streak" },
+          ],
+          submissions: [
+            {
+              id: 1,
+              problemId: "1",
+              problemTitle: "Smart Contract Security Challenge",
+              status: "accepted",
+              submittedAt: new Date().toISOString(),
+              language: "Solidity",
+              runtime: 120,
+            },
+            {
+              id: 2,
+              problemId: "2",
+              problemTitle: "DeFi Protocol Implementation",
+              status: "wrong_answer",
+              submittedAt: new Date(Date.now() - 86400000).toISOString(),
+              language: "Solidity",
+              runtime: 150,
+            },
+          ],
+        };
+
+        const mockSolvedProblems = [
+          {
+            id: "1",
+            title: "Smart Contract Security Challenge",
+            difficulty: "medium",
+            solvedAt: new Date().toISOString(),
+            score: 95,
+            plagiarismScore: 0,
+          },
+          {
+            id: "2",
+            title: "Simple Token Implementation",
+            difficulty: "easy",
+            solvedAt: new Date(Date.now() - 172800000).toISOString(),
+            score: 100,
+            plagiarismScore: 0,
+          },
+        ];
+
+        setProfile(mockProfile);
+        setSolvedProblems(mockSolvedProblems);
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [router]);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8 min-h-screen flex items-center justify-center">
+        <div className="text-center">Loading profile...</div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="container mx-auto py-8 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="mb-4">Profile not found</p>
+          <Button onClick={() => router.push('/')}>Return to Home</Button>
+        </div>
+      </div>
+    );
+  }
 
   // Calculate problem stats
-  const totalSolved = solvedProblems.length
-  const easySolved = solvedProblems.filter((p) => p.difficulty === "easy").length
-  const mediumSolved = solvedProblems.filter((p) => p.difficulty === "medium").length
-  const hardSolved = solvedProblems.filter((p) => p.difficulty === "hard").length
+  const totalSolved = solvedProblems.length;
+  const easySolved = solvedProblems.filter((p) => p.difficulty === "easy").length;
+  const mediumSolved = solvedProblems.filter((p) => p.difficulty === "medium").length;
+  const hardSolved = solvedProblems.filter((p) => p.difficulty === "hard").length;
+  
+  // Calculate streak data
+  const currentStreak = profile.streakData.currentStreak;
+  const maxStreak = profile.streakData.maxStreak;
+  const streakPercentage = (currentStreak / maxStreak) * 100;
 
+  // Then keep the rest of your original profile page rendering code
   return (
-    <div className="container mx-auto py-8 min-h-screen bg-background text-foreground">
+    <div className="container mx-auto py-20 min-h-screen bg-background text-foreground">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">My Profile</h1>
+        <p className="text-muted-foreground">Connected wallet: {walletAddress.substring(0, 6)}...{walletAddress.substring(walletAddress.length - 4)}</p>
+      </div>
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Profile sidebar */}
         <div className="lg:col-span-1">
+          {/* The rest of your profile UI remains the same */}
           <Card className="border border-border bg-card/50 backdrop-blur-sm overflow-hidden">
             <CardHeader className="pb-2">
               <div className="flex flex-col items-center text-center">
@@ -303,6 +427,6 @@ export default async function ProfilePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Code, BookOpen, Award, ChevronRight, X, Menu, LogOut } from "lucide-react";
+import { Code, BookOpen, Award, ChevronRight, X, Menu, LogOut, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Input } from "../../components/ui/input";
@@ -177,6 +177,16 @@ export default function CourseExplorer() {
                 <div className="bg-slate-800 border border-slate-700 rounded-full px-4 py-1 text-sm text-cyan-400">
                   {formatAddress(walletAddress)}
                 </div>
+                {/* Add Profile Button */}
+                <Button 
+                  size="sm" 
+                  variant="ghost"
+                  className="text-slate-400 hover:text-white"
+                  onClick={() => router.push('/profile')}
+                  title="View Profile"
+                >
+                  <User className="h-4 w-4" />
+                </Button>
                 <Button 
                   size="sm" 
                   variant="ghost"

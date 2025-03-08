@@ -18,6 +18,7 @@ import {
   Twitter,
   X,
   LogOut,
+  User, // Add User icon
 } from "lucide-react"
 
 import { Button } from "../components/ui/button"
@@ -125,6 +126,16 @@ export default function Home() {
                   <div className="bg-slate-800 border border-slate-700 rounded-full px-4 py-1 text-sm text-cyan-400">
                     {formatAddress(walletAddress)}
                   </div>
+                  {/* Add Profile Button */}
+                  <Button 
+                    size="sm" 
+                    variant="ghost"
+                    className="text-slate-400 hover:text-white"
+                    onClick={() => router.push('/profile')}
+                    title="View Profile"
+                  >
+                    <User className="h-4 w-4" />
+                  </Button>
                   <Button 
                     size="sm" 
                     variant="ghost"
@@ -714,7 +725,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ duration: 0.5 }}
               className="bg-slate-800/80 backdrop-blur-sm border border-slate-700 rounded-xl p-8 shadow-xl"
             >
               <h3 className="text-2xl font-bold mb-6">Create Your Account</h3>
