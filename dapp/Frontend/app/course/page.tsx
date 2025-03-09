@@ -47,12 +47,13 @@ export default function CourseList() {
             {courses.map((course) => (
               <tr key={course.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">
-                <Link 
-  href={`/courses/${course.id.replace(/-/g, '')}`}
-  className="text-purple-400 hover:text-purple-300"
->
-  {course.title}
-</Link>
+                  {/* Changed from /courses/ to /course/ */}
+                  <Link 
+                    href={`/course/${course.id.replace(/-/g, '')}`}
+                    className="text-purple-400 hover:text-purple-300"
+                  >
+                    {course.title}
+                  </Link>
                 </td>
                 <td className="px-6 py-4 text-gray-400">
                   {format(new Date(course.createdAt), 'MMM dd, yyyy HH:mm')}

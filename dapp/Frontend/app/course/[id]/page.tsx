@@ -15,8 +15,11 @@ export default function CourseDetail() {
   const [course, setCourse] = useState<Course | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // Convert hyphen-less ID back to UUID format
-  const originalId = Array.isArray(id) ? id[0].replace(/(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/, "$1-$2-$3-$4-$5") : id.replace(/(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/, "$1-$2-$3-$4-$5")
+  // Fix the UUID format conversion
+  // Account for params possibly being a string or string[]
+  const originalId = typeof id === 'string' 
+    ? id.replace(/(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/, "$1-$2-$3-$4-$5") 
+    : id[0].replace(/(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/, "$1-$2-$3-$4-$5")
 
   useEffect(() => {
     const fetchCourse = async () => {

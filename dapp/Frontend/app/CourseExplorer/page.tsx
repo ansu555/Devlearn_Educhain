@@ -32,8 +32,8 @@ export default function CourseExplorer() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showAIModal, setShowAIModal] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
-  const [completedCourses, setCompletedCourses] = useState<number[]>([]);
   const [walletAddress, setWalletAddress] = useState("");
+  const [ocidUser, setOcidUser] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1000);
@@ -42,6 +42,12 @@ export default function CourseExplorer() {
     const storedAddress = localStorage.getItem("walletAddress");
     if (storedAddress) {
       setWalletAddress(storedAddress);
+    }
+    
+    // Check for OCID user in localStorage
+    const savedOcidUser = localStorage.getItem("ocidUser");
+    if (savedOcidUser) {
+      setOcidUser(JSON.parse(savedOcidUser));
     }
     
     return () => clearTimeout(timer);
@@ -104,19 +110,16 @@ export default function CourseExplorer() {
     }
   };
 
-  const toggleCourseCompletion = (courseId: number, event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent card click event from triggering
-    setCompletedCourses(prev => 
-      prev.includes(courseId)
-        ? prev.filter(id => id !== courseId) // Remove if already completed
-        : [...prev, courseId]  // Add if not completed
-    );
-  };
-
   // Function to disconnect wallet
   const disconnectWallet = () => {
     localStorage.removeItem("walletAddress");
     setWalletAddress("");
+  }
+  
+  // Function to disconnect OCID
+  const disconnectOcid = () => {
+    localStorage.removeItem("ocidUser");
+    setOcidUser(null);
   }
 
   // Function to format address for display
@@ -310,25 +313,10 @@ export default function CourseExplorer() {
                 <Card className="bg-gray-900 border-gray-800 h-full flex flex-col overflow-hidden">
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-2">
-                        <Badge className="bg-purple-600 hover:bg-purple-700">{course.level}</Badge>
-                        <div 
-                          onClick={(e) => toggleCourseCompletion(course.id, e)}
-                          className={`w-6 h-6 rounded border flex items-center justify-center cursor-pointer transition-colors ${
-                            completedCourses.includes(course.id) 
-                              ? 'bg-green-500 border-green-600' 
-                              : 'bg-transparent border-gray-600 hover:border-gray-400'
-                          }`}
-                          title={completedCourses.includes(course.id) ? "Mark as incomplete" : "Mark as complete"}
-                        >
-                          {completedCourses.includes(course.id) && (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                          )}
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="border-gray-700">{course.duration}</Badge>
+                      <Badge className="bg-purple-600 hover:bg-purple-700">{course.level}</Badge>
+                      <Badge variant="outline" className="border-gray-700">
+                        {course.duration}
+                      </Badge>
                     </div>
                     <CardTitle className="text-xl mt-2">{course.title}</CardTitle>
                     <CardDescription className="text-gray-400">{course.description}</CardDescription>

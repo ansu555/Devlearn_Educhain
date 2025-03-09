@@ -1,9 +1,9 @@
 "use client"
 
-import { Search, Code, X, Menu } from "lucide-react"
+import { Search, Code, X, Menu, LogOut, User } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import ChallengesList from "../../components/Challanges/challenges-list"
 import { Input } from "../../components/ui/input"
 import { Button } from "../../components/ui/button"
@@ -13,6 +13,48 @@ export default function Home() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [walletAddress, setWalletAddress] = useState("");
+  const [ocidUser, setOcidUser] = useState(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+    }
+
+    // Check for connected wallet on component mount
+    const storedAddress = localStorage.getItem("walletAddress");
+    if (storedAddress) {
+      setWalletAddress(storedAddress);
+    }
+
+    // Check for OCID user in localStorage
+    const savedOcidUser = localStorage.getItem("ocidUser");
+    if (savedOcidUser) {
+      setOcidUser(JSON.parse(savedOcidUser));
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, []);
+
+  // Function to disconnect wallet
+  const disconnectWallet = () => {
+    localStorage.removeItem("walletAddress");
+    setWalletAddress("");
+  }
+
+  // Function to disconnect OCID
+  const disconnectOcid = () => {
+    localStorage.removeItem("ocidUser");
+    setOcidUser(null);
+  }
+
+  // Function to format address for display (0x1234...5678)
+  const formatAddress = (address) => {
+    if (!address) return "";
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  }
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
     {/* Header */}
@@ -69,14 +111,45 @@ export default function Home() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.4 }}
           >
-            <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0"  onClick={() => router.push('../signup')}>
-              Sign in
-            </Button>
+            {walletAddress || ocidUser ? (
+              <div className="flex items-center gap-2">
+                <div className="bg-slate-800 border border-slate-700 rounded-full px-4 py-1 text-sm text-cyan-400">
+                  {walletAddress ? formatAddress(walletAddress) : ocidUser.email || ocidUser.sub || "User"}
+                </div>
+                {/* Profile Button */}
+                <Button 
+                  size="sm" 
+                  variant="ghost"
+                  className="text-slate-400 hover:text-white"
+                  onClick={() => router.push('/profile')}
+                  title="View Profile"
+                >
+                  <User className="h-4 w-4" />
+                </Button>
+                {/* Logout Button */}
+                <Button 
+                  size="sm" 
+                  variant="ghost"
+                  className="text-slate-400 hover:text-white"
+                  onClick={walletAddress ? disconnectWallet : disconnectOcid}
+                  title={walletAddress ? "Disconnect wallet" : "Disconnect OCID"}
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0"  
+                onClick={() => router.push('../signup')}
+              >
+                Sign in
+              </Button>
+            )}
           </motion.div>
         </nav>
 
         {/* Mobile Menu Button */}
-        <button className="md:hidden text-white" onClick={() => {setIsMenuOpen(!isMenuOpen); router.push('/signup');}}>
+        <button className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
           {isMenuOpen ? <X /> : <Menu />}
         </button>
       </div>

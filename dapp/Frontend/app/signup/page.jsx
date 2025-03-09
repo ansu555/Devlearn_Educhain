@@ -1,24 +1,80 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react"; // Add useState and useEffect
+import { useState, useEffect } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { useOCAuth } from "@opencampus/ocid-connect-js"; // Import the hook
-import { useRouter } from "next/navigation"; // Import router
+import { useOCAuth } from "@opencampus/ocid-connect-js";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
   const { ocAuth } = useOCAuth();
   const router = useRouter();
   const [walletAddress, setWalletAddress] = useState("");
+  const [ocidUser, setOcidUser] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // Handle OCID redirect and check existing sessions
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Check if we're returning from a redirect
+        const result = await ocAuth.handleRedirectResult();
+        
+        // Check if user is already signed in
+        const user = await ocAuth.getUser();
+        
+        if (user) {
+          console.log("OCID user:", user);
+          setOcidUser(user);
+          localStorage.setItem("ocidUser", JSON.stringify(user));
+          router.push('/');
+        } else if (result?.user) {
+          console.log("OCID login successful:", result.user);
+          setOcidUser(result.user);
+          localStorage.setItem("ocidUser", JSON.stringify(result.user));
+          router.push('/');
+        }
+      } catch (error) {
+        console.error("OCID auth check error:", error);
+        setError("Failed to authenticate with OCID");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Check for MetaMask wallet in localStorage
+    const savedWallet = localStorage.getItem("walletAddress");
+    if (savedWallet) {
+      setWalletAddress(savedWallet);
+      router.push('/');
+      return;
+    }
+
+    // Check for OCID user in localStorage
+    const savedOcidUser = localStorage.getItem("ocidUser");
+    if (savedOcidUser) {
+      setOcidUser(JSON.parse(savedOcidUser));
+      router.push('/');
+      return;
+    }
+
+    checkAuth();
+  }, [ocAuth, router]);
 
   const handleOCIDLogin = async () => {
     try {
+      setIsConnecting(true);
       await ocAuth.signInWithRedirect({ state: "opencampus" });
     } catch (error) {
       console.error("Login error:", error);
+      setError(error.message || "Failed to connect with OCID");
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -127,15 +183,15 @@ export default function SignUpPage() {
               <Button 
                 variant="outline" 
                 className="w-full border-gray-700 py-6 hover:bg-gray-800"
-                onClick={handleOCIDLogin}  // Add the onClick handler here
+                onClick={handleOCIDLogin}
+                disabled={isConnecting || isLoading}
               >
-            
                 {/* Optionally, reuse your OCID SVG */}
                 <svg viewBox="0 0 24 24" className="mr-2 h-5 w-5" fill="currentColor">
                   <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/>
                   <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
-                Continue with OCID
+                {isConnecting ? "Connecting..." : "Continue with OCID"}
               </Button>
             </div>
 
