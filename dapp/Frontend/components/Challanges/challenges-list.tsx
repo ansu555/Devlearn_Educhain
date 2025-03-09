@@ -38,7 +38,7 @@ const challenges: Challenge[] = [
   },
   {
     id: 3,
-    title: "JavaScript Todo App",
+    title: "JavaScript Todo Application",
     description: "Build a todo application with vanilla JavaScript",
     difficulty: "Beginner",
     technologies: ["JavaScript"],
@@ -47,7 +47,7 @@ const challenges: Challenge[] = [
   },
   {
     id: 4,
-    title: "NFT Marketplace",
+    title: "Non-FungibleToken Marketplace",
     description: "Develop a simple NFT marketplace with ERC-721 tokens",
     difficulty: "Advanced",
     technologies: ["Solidity", "React", "Blockchain"],
@@ -56,7 +56,7 @@ const challenges: Challenge[] = [
   },
   {
     id: 5,
-    title: "React Weather App",
+    title: "React Weather Application",
     description: "Create a weather application using React and a weather API",
     difficulty: "Intermediate",
     technologies: ["React", "API"],
