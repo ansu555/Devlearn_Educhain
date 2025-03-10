@@ -14,3 +14,5 @@ npx hardhat ignition deploy ./ignition/modules/Lock.ts
 
 
 contract address:: 0x95829976c0cd4a58fBaA4802410d10BDe15E3CA0
+
+in educhain 
